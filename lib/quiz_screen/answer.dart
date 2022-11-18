@@ -17,11 +17,14 @@ class Answer extends StatelessWidget {
         child: InkWell(
       onTap: () => handleTap(),
       child: Card(
-        color: bgColor ?? Colors.white,
+        color: bgColor,
         child: Center(
             child: Padding(
           padding: const EdgeInsets.all(15),
-          child: Text(text),
+          child: Text(
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge,
+              text),
         )),
       ),
     ));

@@ -8,10 +8,14 @@ import 'loading_bar.dart';
 
 class Question extends StatefulWidget {
   const Question(
-      {super.key, required this.question, required this.getNextQuestion});
+      {super.key,
+      required this.question,
+      required this.getNextQuestion,
+      required this.index});
 
   final QuestionWithAnswers question;
   final Function getNextQuestion;
+  final int index;
 
   @override
   State<Question> createState() => _QuestionState();
@@ -20,25 +24,33 @@ class Question extends StatefulWidget {
 class _QuestionState extends State<Question> {
   var answerStates = <int, Color>{};
   var loading = false;
+  var buttonsDisabled = false;
 
   void getNextQuestion() {
     Timer(const Duration(milliseconds: 500), () {
-      widget.getNextQuestion();
-      answerStates = {};
+      setState(() {
+        widget.getNextQuestion();
+        answerStates = {};
+        buttonsDisabled = false;
+      });
     });
   }
 
   void chooseAnswer(int index) {
-    if (!loading) {
-      setState(() {
-        if (index == widget.question.correctIndex) {
+    if (!loading && !buttonsDisabled) {
+      if (index == widget.question.correctIndex) {
+        setState(() {
           answerStates[index] = Colors.green;
-          getNextQuestion();
-        } else {
+        });
+
+        buttonsDisabled = true;
+        getNextQuestion();
+      } else {
+        setState(() {
           answerStates[index] = Colors.red;
           loading = true;
-        }
-      });
+        });
+      }
     }
   }
 
@@ -55,11 +67,19 @@ class _QuestionState extends State<Question> {
                 children: [
                   Expanded(
                       child: Card(
-                    child: Center(
-                        child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Text(widget.question.question),
-                    )),
+                    child: Stack(children: [
+                      Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Center(
+                            child: Text(
+                                style: Theme.of(context).textTheme.headline6,
+                                widget.question.question)),
+                      ),
+                      Positioned(
+                          bottom: 5,
+                          right: 5,
+                          child: Text((widget.index + 1).toString()))
+                    ]),
                   ))
                 ],
               )),
